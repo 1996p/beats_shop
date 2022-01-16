@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    {% if access %}
+     <form action="{% url 'add-product' %}" method="post">
+         {% csrf_token %}
+
+        {{ form | crispy }}
+
+         <button type="submit" class="btn btn-primary">Create product</button>
+    {% else %}
+    <h2 class="subhead">
+        Access denied
+    </h2>
+    {% endif %}
+
+
+     </form>
+{% endblock %}

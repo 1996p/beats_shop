@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container" style="display: flex; flex-direction: row; justify-content: space-between; min-height: 500px">
+        <img class="rounded-1" src="{% if profile_image_url == '#' %} {% static 'images/avatar.png' %} {% else %} {{ profile_image_url }} {% endif %}" style="max-height: 200px; display: inline" alt="no image">
+        <div style="align-content: space-between">
+            <span style="margin-top: 30px;">
+                <strong>Никнейм:</strong> {{ user.username }}
+            </span> <br>
+            <span>
+                <strong>Email:</strong> {% if user.email == '' %} Нет почты {% else %} {{ user.email }} {% endif %}
+            </span> <br>
+            <span style="margin-top: 30px;">
+                <strong>Имя:</strong> {% if user.first_name == '' %} Нет имени {% else %} {{ user.first_name }} {% endif %}
+            </span> <br>
+            <span>
+                <strong>Фамилия:</strong> {% if user.last_name == '' %} Нет фамилии {% else %} {{ user.last_name }} {% endif %}
+            </span> <br>
+            <span>
+                <strong>Дата регистрации:</strong> {{ user.date_joined }}
+            </span> <br>
+            <span>
+                <strong>Статус продавца:</strong> {% if site_user.contentMakerStatus %} Есть {% else %} Нет {% endif %}
+            </span> <br>
+
+            {% if not site_user.contentMakerStatus %}
+                <a href="{% url 'make-seller-request' %}" class="btn btn-primary" style="margin-top: 30px; margin-bottom: 30px;">Получить статус продавца</a>
+            {% endif %}
+
+            <a href="{% url 'my-cabinet-change' %}" class="btn btn-primary" style="margin-top: 30px; margin-bottom: 30px;">Изменить данные</a>
+            <br>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
+        </div>
+    </div>
+
+    {% if user.is_superuser %}
+
+        <div class="container">
+            <h1 class="display-6">Заявки на получение статуса продаваца:</h1>
+            {% for request in request_list %}
+                <a href="{% url 'get-seller-status-request' request.pk %}"> {{ request.requester }} </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}

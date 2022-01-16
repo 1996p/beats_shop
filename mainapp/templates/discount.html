@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+     <div class="container" style="display: flex; flex-direction: row; margin-top: 30px">
+        <img src="{{ product.image.url }}" class="img-thumbnail" style="max-height: 600px; max-width: 600px; margin-top: 10px" alt="...">
+        <div class="content" style="margin-left: 30px;">
+            <h2 class="subhead" style="text-align: center">
+                {{ product.title }}
+            </h2>
+
+            <p class="description" style="margin-top: 10px; font-size: 20px">
+                {{ product.description }}
+            </p>
+
+            <p class="description" style="margin-top: 10px; font-size: 35px">
+                цена: <strong>{{ product.actual_price }}</strong> P
+            </p>
+                <form action="{% url 'make-discount' id=product.pk %}" method="post">
+                    {% csrf_token %}
+                    {{ form.new_price }}
+                    <br>
+                    <label for="{{ form.make_discount.id_for_label }}">Сделать скидку</label>
+                    {{ form.make_discount }}
+                    <br>
+                    <button type="submit" class="btn btn-primary" style="margin-top: auto">Применить</button>
+                </form>
+        </div>
+
+
+    </div>
+
+{% endblock %}

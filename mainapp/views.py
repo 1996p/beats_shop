@@ -297,6 +297,9 @@ def view404(request, exception):
     response = render(request, 'error404page.html', {})
     return response
 
+def print_shit():
+    print(1)
+
 def LogoutUser(request):
     logout(request)
     return redirect('/')

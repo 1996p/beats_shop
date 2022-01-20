@@ -3,7 +3,9 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import CreateView, View
+from django.urls import reverse_lazy
+from django.views.generic import View
+from django.views.generic.edit import CreateView
 from django.contrib.auth import logout, login
 from .forms import *
 from .models import *
@@ -42,46 +44,62 @@ class AddProduct(CreateView):
     success_url = '/'
 
 
-class AddProductView(View):
-    def get(self, request, *args, **kwargs):
-        form = AddProductForm(request.POST or None)
+# class AddProductView(View):
+#     def get(self, request, *args, **kwargs):
+#         form = AddProductForm(request.POST or None)
+#
+#         try:
+#             access = SiteUser.objects.get(user=request.user).contentMakerStatus
+#         except:
+#             access = False
+#
+#         context = {
+#             'form': form,
+#             'access': access,
+#
+#         }
+#         return render(request=request, template_name='add-product.html', context=context)
+#
+#     def post(self, request, *args, **kwargs):
+#         form = AddProductForm(request.POST or None)
+#
+#         try:
+#             access = SiteUser.objects.get(user=request.user).contentMakerStatus
+#         except:
+#             access = False
+#         print('post')
+#         if form.is_valid():
+#             print('form is valid!!!')
+#             new_product = Product.objects.create(title=form.cleaned_data['title'],
+#                                                  description=form.cleaned_data['description'],
+#                                                  actual_price=form.cleaned_data['actual_price'],
+#                                                  image=form.cleaned_data['image'],
+#                                                  author=SiteUser.objects.get(user=request.user))
+#             new_product.save()
+#             return redirect('home')
+#
+#         context = {
+#             'form': form,
+#             'access': access,
+#         }
+#
+#         return render(request=request, template_name='add-product.html', context=context)
 
+class AddProductView(CreateView):
+    template_name = 'add-product.html'
+    success_url = reverse_lazy('home')
+    form_class = AddProductForm
+
+    def get_context_data(self, **kwargs):
+        context = super(AddProductView, self).get_context_data(**kwargs)
         try:
-            access = SiteUser.objects.get(user=request.user).contentMakerStatus
+            access = SiteUser.objects.get(user=kwargs['request'].user).contentMakerStatus
         except:
-            access = False
+            access = True
 
-        context = {
-            'form': form,
-            'access': access,
+        context['access'] = access
 
-        }
-        return render(request=request, template_name='add-product.html', context=context)
-
-    def post(self, request, *args, **kwargs):
-        form = AddProductForm(request.POST or None)
-
-        try:
-            access = SiteUser.objects.get(user=request.user).contentMakerStatus
-        except:
-            access = False
-        print('post')
-        if form.is_valid():
-            print('form is valid!!!')
-            new_product = Product.objects.create(title=form.cleaned_data['title'],
-                                                 description=form.cleaned_data['description'],
-                                                 actual_price=form.cleaned_data['actual_price'],
-                                                 image=form.cleaned_data['image'],
-                                                 author=SiteUser.objects.get(user=request.user))
-            new_product.save()
-            return redirect('home')
-
-        context = {
-            'form': form,
-            'access': access,
-        }
-
-        return render(request=request, template_name='add-product.html', context=context)
+        return context
 
 
 class MakeDiscountView(View):

@@ -22,16 +22,11 @@ class UserRegister(UserCreationForm):
         model = User
         fields = ('username','email', 'password1', 'password2', 'policy_agree')
 
-class AddProductForm(ModelForm):
+class AddProductForm(forms.Form):
     title = forms.CharField(widget=forms.TextInput())
     description = forms.CharField(widget=forms.Textarea())
     actual_price = forms.IntegerField(widget=forms.NumberInput(attrs={'min': '0'}))
     image = forms.ImageField()
-
-
-    class Meta:
-        model = Product
-        fields = ('title', 'description', 'actual_price', 'image')
 
 
 class MakeDiscountForm(forms.Form):

@@ -36,11 +36,6 @@ class RegisterView(CreateView):
         return redirect('home')
 
 
-class AddProduct(CreateView):
-    template_name = 'add-product.html'
-    form_class = AddProductForm
-    success_url = '/'
-
 
 class AddProductView(View):
     def get(self, request, *args, **kwargs):
@@ -59,7 +54,7 @@ class AddProductView(View):
         return render(request=request, template_name='add-product.html', context=context)
 
     def post(self, request, *args, **kwargs):
-        form = AddProductForm(request.POST or None)
+        form = AddProductForm(request.POST, request.FILES)
 
         try:
             access = SiteUser.objects.get(user=request.user).contentMakerStatus
@@ -73,6 +68,7 @@ class AddProductView(View):
                                                  actual_price=form.cleaned_data['actual_price'],
                                                  image=form.cleaned_data['image'],
                                                  author=SiteUser.objects.get(user=request.user))
+            print(form.cleaned_data)
             new_product.save()
             return redirect('home')
 

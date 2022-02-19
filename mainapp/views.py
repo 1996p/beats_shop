@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
-from django.http import Http404
+from django.db.models import F
+from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import CreateView, View
+from django.template.response import TemplateResponse
+from django.views.generic import CreateView, View, DetailView, ListView
 from django.contrib.auth import logout, login
 from .forms import *
 from .models import *
@@ -12,10 +14,17 @@ from django.template import RequestContext
 
 # Create your views here.
 
+class Index(ListView):
+    template_name = 'homepage.html'
+    context_object_name = 'products'
+    model = Product
+    queryset = Product.objects.all()[:4]
 
-def index(request):
-    products = Product.objects.all()
-    return render(request, 'homepage.html', {'products': products})
+
+def test(request):
+    product_val = Product.objects.values('title', 'actual_price')
+
+    return redirect('home')
 
 
 class AuthenticationView(LoginView):
@@ -72,7 +81,8 @@ class AddProductView(View):
                                                  description=form.cleaned_data['description'],
                                                  actual_price=form.cleaned_data['actual_price'],
                                                  image=form.cleaned_data['image'],
-                                                 author=SiteUser.objects.get(user=request.user))
+                                                 author=SiteUser.objects.get(user=request.user),
+                                                 )
             new_product.save()
             return redirect('home')
 
@@ -302,7 +312,11 @@ def LogoutUser(request):
     logout(request)
     return redirect('/')
 
-
+class AllProduct(ListView):
+    model = Product
+    template_name = 'all-products.html'
+    queryset = Product.objects.all()
+    context_object_name = 'products'
 
 
 

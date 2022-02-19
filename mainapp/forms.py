@@ -31,7 +31,7 @@ class AddProductForm(ModelForm):
 
     class Meta:
         model = Product
-        fields = ('title', 'description', 'actual_price', 'image')
+        fields = ('title', 'description', 'actual_price', 'image', 'category')
 
 
 class MakeDiscountForm(forms.Form):

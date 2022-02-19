@@ -5,6 +5,13 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=128, verbose_name="Категория товара")
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     title = models.CharField(max_length=40, verbose_name='Название')
     description = models.TextField(max_length=255, verbose_name='Описание')
@@ -13,6 +20,7 @@ class Product(models.Model):
     author = models.ForeignKey('SiteUser', on_delete=models.CASCADE, blank=True, null=True)
     sale_status = models.BooleanField(verbose_name='Наличие скидки', blank=True, null=True)
     image = models.ImageField(verbose_name='Изображение', blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name="Категория товара", null=True)
 
     def __str__(self):
         return self.title

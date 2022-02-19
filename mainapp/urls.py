@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', index, name='home'),
+    path('', Index.as_view(), name='home'),
     path('product/<int:id>/', DetailedView.as_view(), name='detailedView'),
     path('login/', AuthenticationView.as_view(), name='login'),
     path('logout/', LogoutUser, name='logout'),
@@ -19,7 +19,9 @@ urlpatterns = [
     path('work/request/<int:pk>/', GetSellerStatusRequestView.as_view(), name='get-seller-status-request'),
     path('work/request/<int:pk>/accept', SellerRequestAccept, name='seller-request-accept'),
     path('work/request/<int:pk>/deny', SellerRequestDeny, name='seller-request-deny'),
-    path('my/get-seller-status/', MakeSellerRequest, name='make-seller-request')
+    path('my/get-seller-status/', MakeSellerRequest, name='make-seller-request'),
+    path('all-products/<str:sorted_by>/', AllProduct.as_view(), name='all-products'),
+    path('test/', test, name='test-view')
 ]
 
 if settings.DEBUG:

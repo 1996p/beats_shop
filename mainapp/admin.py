@@ -7,6 +7,7 @@ from .models import *
 admin.site.register(Product)
 admin.site.register(SiteUser)
 admin.site.register(Cart)
+admin.site.register(CartProduct)
 admin.site.register(Commentary)
 admin.site.register(GetSellerStatusRequest)
 admin.site.register(Category)

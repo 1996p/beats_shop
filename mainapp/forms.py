@@ -20,13 +20,13 @@ class UserRegister(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username','email', 'password1', 'password2', 'policy_agree')
+        fields = ('username', 'email', 'password1', 'password2', 'policy_agree')
 
 class AddProductForm(ModelForm):
-    title = forms.CharField(widget=forms.TextInput())
-    description = forms.CharField(widget=forms.Textarea())
-    actual_price = forms.IntegerField(widget=forms.NumberInput(attrs={'min': '0'}))
-    image = forms.ImageField()
+    # title = forms.CharField(widget=forms.TextInput())
+    # description = forms.CharField(widget=forms.Textarea())
+    # actual_price = forms.IntegerField(widget=forms.NumberInput(attrs={'min': '0'}))
+    # image = forms.ImageField()
 
 
     class Meta:

@@ -6,10 +6,10 @@
     <div class="container" style="display: flex; flex-direction: row; margin-top: 30px">
         <img src="{{ product.image.url }}" class="img-thumbnail" style="max-height: 600px; max-width: 600px; margin-top: 10px" alt="...">
         <div class="content" style="margin-left: 30px;">
-            <h2 class="subhead" style="text-align: center">
-                {{ product.title }}
-            </h2>
 
+            <h2 class="display 6" style="text-align: left; font-weight: 200; font-size: 20px;">
+                <a href="{% url 'all-categories' %}">Все категории</a> // <a href="{% url 'category' pk=product.category.pk %}">{{ product.category }}</a> // <span style="font-weight: 500" >{{ product.title }}</span>
+            </h2>
             <p class="description" style="margin-top: 10px; font-size: 20px">
                 {{ product.description }}
             </p>
@@ -21,7 +21,7 @@
             {% if product.author == author %}
                 <a href="discount/" class="btn btn-primary">Изменить цену</a>
             {% else %}
-                <button class="btn btn-primary" style="margin-top: auto">Добавить в корзину</button>
+                <button class="btn btn-outline-dark mt-auto" style="margin-top: auto">Добавить в корзину</button>
             {% endif %}
         </div>
     </div>

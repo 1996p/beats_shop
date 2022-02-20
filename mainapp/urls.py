@@ -12,7 +12,7 @@ urlpatterns = [
     path('login/', AuthenticationView.as_view(), name='login'),
     path('logout/', LogoutUser, name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('add-product/', AddProductView.as_view(), name='add-product'),
+    path('add-product/', AddProduct.as_view(), name='add-product'),
     path('product/<int:id>/discount/', MakeDiscountView.as_view(), name='make-discount'),
     path('my/', MyCabinet.as_view(), name='my-cabinet'),
     path('my/change', MyCabinetChange.as_view(), name='my-cabinet-change'),
@@ -20,7 +20,10 @@ urlpatterns = [
     path('work/request/<int:pk>/accept', SellerRequestAccept, name='seller-request-accept'),
     path('work/request/<int:pk>/deny', SellerRequestDeny, name='seller-request-deny'),
     path('my/get-seller-status/', MakeSellerRequest, name='make-seller-request'),
-    path('all-products/<str:sorted_by>/', AllProduct.as_view(), name='all-products'),
+    path('all-products/', AllProduct.as_view(), name='all-products'),
+    path('categories/', CategoriesView.as_view(), name='all-categories'),
+    path('category/<int:pk>/', CategoryView.as_view(), name='category'),
+    path('my-cart/', CartView.as_view(), name='cart'),
     path('test/', test, name='test-view')
 ]
 

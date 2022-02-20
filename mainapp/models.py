@@ -11,6 +11,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'Категории'
+        verbose_name = 'Категория'
+
 
 class Product(models.Model):
     title = models.CharField(max_length=40, verbose_name='Название')
@@ -21,12 +25,18 @@ class Product(models.Model):
     sale_status = models.BooleanField(verbose_name='Наличие скидки', blank=True, null=True)
     image = models.ImageField(verbose_name='Изображение', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name="Категория товара", null=True)
+    published = models.DateTimeField(verbose_name='Дата публикации', auto_now_add=True)
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('detailedView', kwargs={'id': self.pk})
+
+    class Meta:
+        verbose_name_plural = 'Товары'
+        verbose_name = 'Товар'
+
 
 class SiteUser(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
@@ -38,13 +48,43 @@ class SiteUser(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        verbose_name_plural = 'Пользователи(extended)'
+        verbose_name = 'Пользователь(extended)'
+
+
 class CartProduct(models.Model):
-    pass
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name='Товар', null=True)
+    qty = models.PositiveIntegerField(verbose_name='Количество', default=1)
+    final_price = models.DecimalField(decimal_places=2, max_digits=8, verbose_name="Общая цена", default=0)
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE, null=True)
+
+    def save(self, *args, **kwargs):
+        self.final_price = float(self.qty * self.product.actual_price)
+        print(self.final_price)
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.product.title} | cart {self.cart.owner.user.username}"
+
+    class Meta:
+        verbose_name_plural = 'Товары из корзины'
+        verbose_name = 'Товар из корзины'
 
 
 class Cart(models.Model):
     owner = models.ForeignKey(SiteUser, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product)
+    # products = models.ManyToManyField(CartProduct)
+    final_price = models.DecimalField(decimal_places=2, max_digits=8, verbose_name="Итого к оплате", default=0)
+    total_product = models.PositiveIntegerField(verbose_name='Всего товаров', default=0)
+
+    def __str__(self):
+        return f'Владелец - {self.owner.user.username} | cart id - {self.pk}'
+
+    class Meta:
+        verbose_name_plural = 'Корзины'
+        verbose_name = 'Корзина'
+
 
 class Commentary(models.Model):
     author = models.ForeignKey(SiteUser, on_delete=models.CASCADE, verbose_name='Автор комментария')
@@ -55,6 +95,10 @@ class Commentary(models.Model):
 
     def __str__(self):
         return f'{str(self.product)} : {self.content[:50]}'
+
+    class Meta:
+        verbose_name_plural = 'Комментарии'
+        verbose_name = 'Комментарий'
 
 
 class GetSellerStatusRequest(models.Model):
@@ -70,4 +114,7 @@ class GetSellerStatusRequest(models.Model):
 
     def __str__(self):
         return f'{str(self.requester)} | {self.request_status}'
+
+    class Meta:
+        unique_together = ('request_date', 'requester')
 

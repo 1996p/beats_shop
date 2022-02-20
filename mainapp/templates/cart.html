@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container" style="margin-top: 50px">
+        <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Наименование</th>
+      <th scope="col">Изображение</th>
+      <th scope="col">Цена</th>
+      <th scope="col">Количество</th>
+      <th scope="col">Общая цена</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ cart.cart_product_set }}
+    {% for cart_product in cart_products %}
+        <tr>
+          <th scope="row">{{ cart_product.product.title }}</th>
+          <td><img alt="NO IMAGE" src="{{ cart_product.product.image.url }}" style="max-width: 200px"/></td>
+          <td>{{ cart_product.product.actual_price }}</td>
+          <td>{{ cart_product.qty }}</td>
+          <td>{{ cart_product.final_price }}</td>
+        </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+    </div>
+{%  endblock %}

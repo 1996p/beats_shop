@@ -20,6 +20,11 @@ class Index(ListView):
     model = Product
     queryset = Product.objects.all()[:4]
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cart = Cart.objects.get(owner=SiteUser.objects.get(user=self.request.user))
+        context['cart_length'] = cart.cartproduct_set.count()
+        return context
 
 def test(request):
     product_val = Product.objects.values('title', 'actual_price')
@@ -49,49 +54,16 @@ class AddProduct(CreateView):
     template_name = 'add-product.html'
     form_class = AddProductForm
     success_url = '/'
+    model = Product
 
-
-class AddProductView(View):
-    def get(self, request, *args, **kwargs):
-        form = AddProductForm(request.POST or None)
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         try:
-            access = SiteUser.objects.get(user=request.user).contentMakerStatus
+            context['access'] = SiteUser.objects.get(user=self.request.user).contentMakerStatus
         except:
-            access = False
+            context['access'] = False
 
-        context = {
-            'form': form,
-            'access': access,
-
-        }
-        return render(request=request, template_name='add-product.html', context=context)
-
-    def post(self, request, *args, **kwargs):
-        form = AddProductForm(request.POST or None)
-
-        try:
-            access = SiteUser.objects.get(user=request.user).contentMakerStatus
-        except:
-            access = False
-        print('post')
-        if form.is_valid():
-            print('form is valid!!!')
-            new_product = Product.objects.create(title=form.cleaned_data['title'],
-                                                 description=form.cleaned_data['description'],
-                                                 actual_price=form.cleaned_data['actual_price'],
-                                                 image=form.cleaned_data['image'],
-                                                 author=SiteUser.objects.get(user=request.user),
-                                                 )
-            new_product.save()
-            return redirect('home')
-
-        context = {
-            'form': form,
-            'access': access,
-        }
-
-        return render(request=request, template_name='add-product.html', context=context)
+        return context
 
 
 class MakeDiscountView(View):
@@ -130,6 +102,7 @@ class MakeDiscountView(View):
             return redirect('/')
 
         return render(request, 'discount.html', context)
+
 
 class DetailedView(View):
     def get(self, request, *args, **kwargs):
@@ -179,6 +152,7 @@ class DetailedView(View):
             print(type(request.user))
             return redirect('/')
 
+
 class MyCabinet(View):
     def get(self, request, *agrs, **kwargs):
         try:
@@ -210,6 +184,7 @@ class MyCabinet(View):
 
     def post(self, request, *args, **kwargs):
         pass
+
 
 class MyCabinetChange(View):
     def get(self, request, *args, **kwargs):
@@ -266,6 +241,7 @@ class MyCabinetChange(View):
 
         return redirect('/')
 
+
 class GetSellerStatusRequestView(View):
     def get(self, request, *args, **kwargs):
         seller_request = GetSellerStatusRequest.objects.get(pk=kwargs['pk'])
@@ -275,6 +251,7 @@ class GetSellerStatusRequestView(View):
     def post(self, request, *args, **kwargs):
 
         return render(request, 'seller-request.html', {})
+
 
 def SellerRequestAccept(request, pk):
     seller_request = GetSellerStatusRequest.objects.get(pk=pk)
@@ -288,6 +265,7 @@ def SellerRequestAccept(request, pk):
 
     return redirect('/my')
 
+
 def SellerRequestDeny(request, pk):
     seller_request = GetSellerStatusRequest.objects.get(pk=pk)
     seller_request.request_status = GetSellerStatusRequest.RequestStatus.denied
@@ -296,12 +274,14 @@ def SellerRequestDeny(request, pk):
 
     return redirect('/my')
 
+
 def MakeSellerRequest(request):
     requester = SiteUser.objects.get(user=request.user)
     new_seller_request = GetSellerStatusRequest.objects.get_or_create(requester=requester)
     print(new_seller_request)
     new_seller_request[0].save()
     return redirect('/my')
+
 
 def view404(request, exception):
     response = render(request, 'error404page.html', {})
@@ -312,6 +292,7 @@ def LogoutUser(request):
     logout(request)
     return redirect('/')
 
+
 class AllProduct(ListView):
     model = Product
     template_name = 'all-products.html'
@@ -319,13 +300,44 @@ class AllProduct(ListView):
     context_object_name = 'products'
 
 
+class CategoriesView(ListView):
+    model = Category
+    template_name = 'all-categories.html'
+    context_object_name = 'categories'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['products'] = Product.objects.all()
+        print(context)
+        return context
 
 
+class CategoryView(ListView):
+    template_name = 'category.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        return Product.objects.filter(category=self.kwargs['pk'])
 
 
+class CartView(ListView):
+    model = Cart
+    template_name = 'cart.html'
+    context_object_name = 'cart_products'
 
+    def get_queryset(self):
+        cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
+        print(cart)
+        cart_products = cart.cartproduct_set.all()
+        print(cart_products[0].qty)
+        return cart_products
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
+        cart_length = cart.cartproduct_set.count
+        context['cart_length'] = cart_length
+        return context
 
 
 

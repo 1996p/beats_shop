@@ -22,8 +22,11 @@ class Index(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        cart = Cart.objects.get(owner=SiteUser.objects.get(user=self.request.user))
-        context['cart_length'] = cart.cartproduct_set.count()
+        try:
+            cart = Cart.objects.get(owner=SiteUser.objects.get(user=self.request.user))
+            context['cart_length'] = cart.cartproduct_set.count()
+        except Exception:
+            pass
         return context
 
 def test(request):
@@ -326,10 +329,11 @@ class CartView(ListView):
     context_object_name = 'cart_products'
 
     def get_queryset(self):
-        cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
-        print(cart)
-        cart_products = cart.cartproduct_set.all()
-        print(cart_products[0].qty)
+        try:
+            cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
+            cart_products = cart.cartproduct_set.all()
+        except Exception:
+            cart_products = None
         return cart_products
 
     def get_context_data(self, **kwargs):
@@ -339,6 +343,18 @@ class CartView(ListView):
         context['cart_length'] = cart_length
         return context
 
+class AddToCartView(View):
+    def get(self, request, *args, **kwargs):
+        user = SiteUser.objects.get(user=request.user)
+        cart = Cart.objects.get_or_create(owner=user)
+        cart[0].save()
+        product = Product.objects.get(pk=kwargs['id'])
+        cart_product, created = CartProduct.objects.get_or_create(product=product, cart=cart[0])
+        if not created:
+            cart_product.qty += 1
+        cart_product.save()
+        
+        return redirect('/')
 
 
 

@@ -24,6 +24,7 @@ urlpatterns = [
     path('categories/', CategoriesView.as_view(), name='all-categories'),
     path('category/<int:pk>/', CategoryView.as_view(), name='category'),
     path('my-cart/', CartView.as_view(), name='cart'),
+    path('add-to-card/<int:id>/', AddToCartView.as_view(), name='add-to-cart'),
     path('test/', test, name='test-view')
 ]
 

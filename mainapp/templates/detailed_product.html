@@ -15,13 +15,13 @@
             </p>
 
             <p class="description" style="margin-top: 10px; font-size: 35px">
-                цена: <strong class="product-price">{{ product.actual_price }}</strong> P
+                цена: <strong class="product-price">{{ product.actual_price }}</strong> ₽
             </p>
 
             {% if product.author == author %}
                 <a href="discount/" class="btn btn-primary">Изменить цену</a>
             {% else %}
-                <button class="btn btn-outline-dark mt-auto" style="margin-top: auto">Добавить в корзину</button>
+                <a href="{% url 'add-to-cart' id=product.pk %}" class="btn btn-outline-dark mt-auto" style="margin-top: auto">Добавить в корзину</a>
             {% endif %}
         </div>
     </div>

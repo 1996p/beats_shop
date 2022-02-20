@@ -65,7 +65,7 @@ class CartProduct(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.product.title} | cart {self.cart.owner.user.username}"
+        return f"{self.product.title} | qty {self.qty} |cart {self.cart.owner.user.username}"
 
     class Meta:
         verbose_name_plural = 'Товары из корзины'
@@ -79,7 +79,7 @@ class Cart(models.Model):
     total_product = models.PositiveIntegerField(verbose_name='Всего товаров', default=0)
 
     def __str__(self):
-        return f'Владелец - {self.owner.user.username} | cart id - {self.pk}'
+        return f'Владелец - {self.owner.user.username} |cart id - {self.pk}'
 
     class Meta:
         verbose_name_plural = 'Корзины'

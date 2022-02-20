@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
+from decimal import Decimal
 
 class Category(models.Model):
     name = models.CharField(max_length=128, verbose_name="Категория товара")
@@ -56,11 +56,11 @@ class SiteUser(models.Model):
 class CartProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name='Товар', null=True)
     qty = models.PositiveIntegerField(verbose_name='Количество', default=1)
-    final_price = models.DecimalField(decimal_places=2, max_digits=8, verbose_name="Общая цена", default=0)
+    final_price = models.DecimalField(decimal_places=2, max_digits=30, verbose_name="Общая цена", default=0)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
-        self.final_price = float(self.qty * self.product.actual_price)
+        self.final_price = Decimal(self.qty) * Decimal(self.product.actual_price)
         print(self.final_price)
         return super().save(*args, **kwargs)
 

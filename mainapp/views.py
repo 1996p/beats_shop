@@ -18,7 +18,7 @@ class Index(ListView):
     template_name = 'homepage.html'
     context_object_name = 'products'
     model = Product
-    queryset = Product.objects.all()[:4]
+    queryset = Product.objects.all().order_by('-published')[:4]
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -332,6 +332,8 @@ class CartView(ListView):
         try:
             cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
             cart_products = cart.cartproduct_set.all()
+            for cart_product in cart_products:
+                cart_product.save()
         except Exception:
             cart_products = None
         return cart_products

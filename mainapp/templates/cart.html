@@ -14,17 +14,34 @@
         </tr>
       </thead>
       <tbody>
-        {{ cart.cart_product_set }}
+
         {% for cart_product in cart_products %}
             <tr>
               <th scope="row"><a style="color: #212529" href="{% url 'detailedView' id=cart_product.product.pk %}">{{ cart_product.product.title }}</a></th>
               <td><a href="{% url 'detailedView' id=cart_product.product.pk %}"><img alt="NO IMAGE" src="{{ cart_product.product.image.url }}" style="max-width: 200px"/></a></td>
               <td class="product-price">{{ cart_product.product.actual_price }} ₽</td>
-              <td>{{ cart_product.qty }}</td>
+              <td>
+                  <a href="{% url 'reduce-qty' id=cart_product.pk %}" class="badge bg-danger text-white ms-1 rounded-pill" style="text-decoration: none;"> - </a>
+                  {{ cart_product.qty }}
+                    <a href="{% url 'increase-qty' id=cart_product.pk %}" class="badge bg-success text-white ms-1 rounded-pill" style="text-decoration: none;"> + </a>
+              </td>
               <td class="product-price">{{ cart_product.final_price }} ₽</td>
             </tr>
         {% endfor %}
-
+        <tr>
+            <td class="product-price"></td>
+            <td class="product-price"></td>
+            <td class="product-price" style="margin-left: auto;"></td>
+            <td class="product-price" style="padding-left: 31px;font-weight: 800;">Всего товаров: {{ cart.total_product }}</td>
+            <td class="product-price" style="margin-right: 70px;font-weight: 800"> Итого к оплате: {{ cart.final_price }} ₽</td>
+        </tr>
+          <tr>
+            <td class="product-price"></td>
+            <td class="product-price"></td>
+            <td class="product-price"></td>
+            <td class="product-price"></td>
+            <td class="btn bg-success text-white mt-3 ml-2">Оплатить</td>
+        </tr>
       </tbody>
     </table>
     {% else %}

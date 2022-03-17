@@ -5,6 +5,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
 from django.template.response import TemplateResponse
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, View, DetailView, ListView
 from django.contrib.auth import logout, login
 from .forms import *
@@ -77,8 +78,7 @@ class MakeDiscountView(View):
             raise Http404
         form = MakeDiscountForm(request.POST or None)
         context = {'product': product,
-                   'form': form
-                   }
+                   'form': form}
         return render(request, 'discount.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -342,8 +342,11 @@ class CartView(ListView):
         context = super().get_context_data(**kwargs)
         cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
         cart_length = cart.cartproduct_set.count
+        cart.save()
+        context['cart'] = cart
         context['cart_length'] = cart_length
         return context
+
 
 class AddToCartView(View):
     def get(self, request, *args, **kwargs):
@@ -356,7 +359,32 @@ class AddToCartView(View):
             cart_product.qty += 1
         cart_product.save()
         
-        return redirect('/')
+        return redirect('cart')
+
+
+class IncreaseQty(View):
+    def get(self, request, *args, **kwargs):
+        cart = Cart.objects.get(owner=SiteUser.objects.get(user=request.user))
+        cart_product = cart.cartproduct_set.get(pk=kwargs['id'])
+        cart_product.qty += 1
+        cart_product.save()
+        cart.save()
+        return redirect('cart')
+
+
+class ReduceQty(View):
+    def get(self, request, *args, **kwargs):
+        cart = Cart.objects.get(owner=SiteUser.objects.get(user=request.user))
+        cart_product = cart.cartproduct_set.get(pk=kwargs['id'])
+        cart_product.qty -= 1
+
+        if cart_product.qty == 0:
+            cart_product.delete()
+            cart.save()
+            return redirect('cart')
+        cart_product.save()
+        cart.save()
+        return redirect('cart')
 
 
 

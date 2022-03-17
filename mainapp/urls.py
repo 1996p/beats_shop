@@ -25,6 +25,8 @@ urlpatterns = [
     path('category/<int:pk>/', CategoryView.as_view(), name='category'),
     path('my-cart/', CartView.as_view(), name='cart'),
     path('add-to-card/<int:id>/', AddToCartView.as_view(), name='add-to-cart'),
+    path('my-cart/increase/<int:id>', IncreaseQty.as_view(), name='increase-qty'),
+    path('my-cart/reduce/<int:id>', ReduceQty.as_view(), name='reduce-qty'),
     path('test/', test, name='test-view')
 ]
 

@@ -61,7 +61,6 @@ class CartProduct(models.Model):
 
     def save(self, *args, **kwargs):
         self.final_price = Decimal(self.qty) * Decimal(self.product.actual_price)
-        print(self.final_price)
         return super().save(*args, **kwargs)
 
     def __str__(self):
@@ -75,11 +74,19 @@ class CartProduct(models.Model):
 class Cart(models.Model):
     owner = models.ForeignKey(SiteUser, on_delete=models.CASCADE)
     # products = models.ManyToManyField(CartProduct)
-    final_price = models.DecimalField(decimal_places=2, max_digits=8, verbose_name="Итого к оплате", default=0)
+    final_price = models.DecimalField(decimal_places=2, max_digits=30, verbose_name="Итого к оплате", default=0)
     total_product = models.PositiveIntegerField(verbose_name='Всего товаров', default=0)
 
+    def save(self, *args, **kwargs):
+        self.final_price = 0
+        self.total_product = 0
+        for cart_product in self.cartproduct_set.all():
+            self.total_product += cart_product.qty
+            self.final_price += Decimal(cart_product.final_price)
+        return super().save(*args, **kwargs)
+
     def __str__(self):
-        return f'Владелец - {self.owner.user.username} |cart id - {self.pk}'
+        return f'Владелец - {self.owner.user.username} | cart id - {self.pk}'
 
     class Meta:
         verbose_name_plural = 'Корзины'

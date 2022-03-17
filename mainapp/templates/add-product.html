@@ -3,6 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+    <div class="container">
     {% if access %}
      <form action="{% url 'add-product' %}" method="post" enctype="multipart/form-data">
          {% csrf_token %}
@@ -11,11 +12,12 @@
 
          <button type="submit" class="btn btn-primary">Create product</button>
     {% else %}
-    <h2 class="subhead">
-        Access denied
+    <h2 class="display-6" style="margin-top: 300px; margin-bottom: 400px;">
+        Чтобы получить доступ к публикации товаров, отправьте запрос в личном кабинете на получение прав.
     </h2>
     {% endif %}
 
 
      </form>
+    </div>
 {% endblock %}

@@ -22,6 +22,7 @@ handler404 = views.view404
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('mainapp.urls'))
+    path('', include('mainapp.urls')),
+    path('api/', include('mainapp.api_urls'))
 ]
 

@@ -12,7 +12,6 @@ from .forms import *
 from .models import *
 from django.shortcuts import render
 from django.template import RequestContext
-
 # Create your views here.
 
 class Index(ListView):
@@ -385,9 +384,6 @@ class ReduceQty(View):
         cart_product.save()
         cart.save()
         return redirect('cart')
-
-
-
 
 
 

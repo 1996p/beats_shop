@@ -36,3 +36,19 @@ class ProductAPIView(APIView):
 
         return Response({'product': serializer.data})
 
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+
+        if not pk:
+            return Response({'error': 'Method is not allowed'})
+
+        try:
+            product = Product.objects.get(pk=pk)
+        except Exception:
+            return Response({'error': 'Product with same PK doesn\'t exist'})
+
+        product.delete()
+
+        return Response({'deleted': f'product {product.title}'})
+
+

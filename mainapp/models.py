@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 
+
 class Category(models.Model):
     name = models.CharField(max_length=128, verbose_name="Категория товара")
 

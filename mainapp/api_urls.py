@@ -3,13 +3,9 @@ from rest_framework import routers
 from .api_views import *
 
 
-router = routers.SimpleRouter()
-router.register(r'products', ProductViewSet)
-
-
 urlpatterns = [
-    # path('v1/productlist/', ProductAPIView.as_view()),
-    # path('v1/product/<int:pk>/', ProductAPIView.as_view()),
-    path('v1/', include(router.urls))
+    path('v1/productlist/', ProductListView.as_view()),
+    path('v1/productupdate/<int:pk>/', ProductUpdateView.as_view()),
+    path('v1/productdelete/<int:pk>/', ProductDeleteView.as_view())
 
 ]

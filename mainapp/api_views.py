@@ -1,57 +1,37 @@
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
 from .models import *
 from .serializers import *
 from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import *
 
 
-# class ProductAPIView(APIView):
-#     def get(self, request):
-#         products = Product.objects.all()
+# class ProductViewSet(viewsets.ModelViewSet):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
 #
-#         return Response({'products': ProductSerializer(products, many=True).data})
-#
-#     def post(self, request):
-#         serializer = ProductSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#
-#         return Response(serializer.data)
-#
-#     def put(self, request, *args, **kwargs):
-#         pk = kwargs.get('pk', None)
-#
-#         if not pk:
-#             return Response({'error': 'Method is not allowed'})
-#
-#         try:
-#             product = Product.objects.get(pk=pk)
-#         except Exception:
-#             return Response({'error': 'Product with same PK doesn\'t exist'})
-#
-#         serializer = ProductSerializer(instance=product, data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#
-#         return Response({'product': serializer.data})
-#
-#     def delete(self, request, *args, **kwargs):
-#         pk = kwargs.get('pk', None)
-#
-#         if not pk:
-#             return Response({'error': 'Method is not allowed'})
-#
-#         try:
-#             product = Product.objects.get(pk=pk)
-#         except Exception:
-#             return Response({'error': 'Product with same PK doesn\'t exist'})
-#
-#         product.delete()
-#
-#         return Response({'deleted': f'product {product.title}'})
+#     @action(methods=['get'], detail=False)
+#     def category(self, request):
+#         categories = Category.objects.all()
+#         return Response({'categories': [{c.name: [p.title for p in c.product_set.all()]} for c in categories]})
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductListView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+
+class ProductDeleteView(generics.RetrieveDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = (IsAdminOrIsReadOnly, )
+
+
+class ProductUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = (IsOwnerOrIsReadOnly, )

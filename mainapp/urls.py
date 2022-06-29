@@ -9,9 +9,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', Index.as_view(), name='home'),
     path('product/<int:id>/', DetailedView.as_view(), name='detailedView'),
-    path('login/', AuthenticationView.as_view(), name='login'),
-    path('logout/', LogoutUser, name='logout'),
-    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', AuthenticationView.as_view(), name='login_main'),
+    path('logout/', LogoutUser, name='logout_main'),
+    path('register/', RegisterView.as_view(), name='register_main'),
     path('add-product/', AddProduct.as_view(), name='add-product'),
     path('product/<int:id>/discount/', MakeDiscountView.as_view(), name='make-discount'),
     path('my/', MyCabinet.as_view(), name='my-cabinet'),

@@ -12,6 +12,7 @@ from .forms import *
 from .models import *
 from django.shortcuts import render
 from django.template import RequestContext
+from django.core.paginator import Paginator
 # Create your views here.
 
 class Index(ListView):
@@ -299,6 +300,7 @@ class AllProduct(ListView):
     model = Product
     template_name = 'all-products.html'
     queryset = Product.objects.all()
+    paginate_by = 4
     context_object_name = 'products'
 
 

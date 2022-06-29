@@ -33,6 +33,21 @@
                                 </div>
                     {% endfor %}
                             </div>
+
+                            <div class="container" style="display: flex; font-size: 20px; justify-content: center;">
+                             {% if page_obj.has_previous %}
+                                 <a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+                                 &nbsp;&nbsp; |  &nbsp;&nbsp;
+                                 {% endif %}
+                                 Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                            {% if page_obj.has_next %}
+                                &nbsp;&nbsp; |  &nbsp;&nbsp;
+                                <a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+
+                            {% endif %}
+
+                            </div>
+
                         </div>
 
 {% endblock %}

@@ -43,8 +43,8 @@ class SiteUser(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     contentMakerStatus = models.BooleanField(verbose_name='Статус продавца')
     image = models.ImageField(blank=True, null=True, verbose_name='Аватар')
+    bonus_balance = models.DecimalField(max_digits=6, decimal_places=2, default=0, verbose_name='Бонусные баллы ')
 
-    '''TODO'''
 
     def __str__(self):
         return self.user.username
@@ -59,6 +59,8 @@ class CartProduct(models.Model):
     qty = models.PositiveIntegerField(verbose_name='Количество', default=1)
     final_price = models.DecimalField(decimal_places=2, max_digits=30, verbose_name="Общая цена", default=0)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True)
+
 
     def save(self, *args, **kwargs):
         self.final_price = Decimal(self.qty) * Decimal(self.product.actual_price)
@@ -125,4 +127,14 @@ class GetSellerStatusRequest(models.Model):
 
     class Meta:
         unique_together = ('request_date', 'requester')
+
+
+class Order(models.Model):
+    class OrderStatus(models.TextChoices):
+        opened = 'O', _('OPENED')
+        closed = 'C', _('CLOSED')
+
+    owner = models.ForeignKey(SiteUser, on_delete=models.CASCADE, verbose_name='Покупатель')
+    creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания заказа')
+    status = models.CharField(max_length=1, choices=OrderStatus.choices, default=OrderStatus.opened, verbose_name='Статус заказа')
 

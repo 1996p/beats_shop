@@ -388,7 +388,36 @@ class ReduceQty(View):
         return redirect('cart')
 
 
+class PaymentView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
+            cart_products = cart.cartproduct_set.all()
+            print(cart_products)
+            if cart_products:
+                for cart_product in cart_products:
+                    cart_product.save()
+            else:
+                cart_products = None
+                return redirect('home')
 
+        except Exception:
+            cart_products = None
+            return redirect('home')
+
+        else:
+            context = {
+                'cart': cart,
+                'cart_products': cart_products,
+                'cart_length': cart_products.count(),
+                'bonus_balance': 1337,
+                'form': BonusInputForm()
+            }
+
+            return render(request, 'payment.html', context)
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
 
 
 

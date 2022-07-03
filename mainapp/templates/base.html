@@ -41,10 +41,16 @@
                                 Welcome, dear <strong>{{ request.user.username }}</strong>!
                             </a>
 
-                            <a href="{% url 'cart' %}" class="btn btn-outline-dark">
+                            <a href="{% url 'cart' %}" class="btn btn-outline-dark" style="margin-right: 10px">
                                 <i class="bi-cart-fill me-1"></i>
                                 Cart
                                 <span class="badge bg-dark text-white ms-1 rounded-pill">{{ cart_length }}</span>
+                            </a>
+
+                             <a href="#" class="btn btn-outline-dark">
+                                <i class="bi-cart-fill me-1"></i>
+                                Бонусы:
+                                <span class="badge bg-dark text-white ms-1 rounded-pill">{{ bonus_balance }}</span>
                             </a>
 
 {#                            <a class="btn btn-outline-dark" style="margin-left: 10px" href="{% url 'logout' %}">#}

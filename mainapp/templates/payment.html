@@ -3,6 +3,7 @@
 {% block content %}
         <div class="container" style="margin-top: 50px">
         {% if cart_products %}
+            <form method="post" action="{% url "payment" %}">{% csrf_token %}
             <table class="table">
       <thead>
         <tr>
@@ -21,17 +22,16 @@
               <td><a href="{% url 'detailedView' id=cart_product.product.pk %}"><img alt="NO IMAGE" src="{{ cart_product.product.image.url }}" style="max-width: 200px"/></a></td>
               <td class="product-price">{{ cart_product.product.actual_price }} ₽</td>
               <td>
-                  <a href="{% url 'reduce-qty' id=cart_product.pk %}" class="badge bg-danger text-white ms-1 rounded-pill" style="text-decoration: none;"> - </a>
                   {{ cart_product.qty }}
-                    <a href="{% url 'increase-qty' id=cart_product.pk %}" class="badge bg-success text-white ms-1 rounded-pill" style="text-decoration: none;"> + </a>
               </td>
               <td class="product-price">{{ cart_product.final_price }} ₽</td>
             </tr>
         {% endfor %}
+        {{ form }}
         <tr>
             <td class="product-price"></td>
             <td class="product-price"></td>
-            <td class="product-price" style="margin-left: auto;"></td>
+            <td class="product-price" style=""></td>
             <td class="product-price" style="padding-left: 31px;font-weight: 800;">Всего товаров: {{ cart.total_product }}</td>
             <td class="product-price" style="margin-right: 70px;font-weight: 800"> Итого к оплате: {{ cart.final_price }} ₽</td>
         </tr>
@@ -40,12 +40,13 @@
             <td class="product-price"></td>
             <td class="product-price"></td>
             <td class="product-price"></td>
-            <td><a href="{% url 'payment'%}" class="btn bg-success text-white mt-3 ml-2">К заказу</a></td>
+            <td><button type="submit" class="btn bg-success text-white mt-3 ml-2">Оплатить</button></td>
         </tr>
       </tbody>
     </table>
+    </form>
     {% else %}
-        <h1 class="display-6" style="text-align: center; margin-top: 200px; margin-bottom: 330px;">Ваша корзина пуста!</h1>
+        <h1 class="display-6" style="text-align: center; margin-top: 200px; margin-bottom: 330px;">Ваша корзина пуста! <br> Поэтому создать заказ невозможно</h1>
     {% endif %}
     </div>
 {%  endblock %}

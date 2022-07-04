@@ -43,7 +43,7 @@ class SiteUser(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     contentMakerStatus = models.BooleanField(verbose_name='Статус продавца')
     image = models.ImageField(blank=True, null=True, verbose_name='Аватар')
-    bonus_balance = models.DecimalField(max_digits=6, decimal_places=2, default=0, verbose_name='Бонусные баллы ')
+    bonus_balance = models.PositiveIntegerField(default=0, verbose_name='Бонусные баллы ')
 
 
     def __str__(self):

@@ -1,6 +1,4 @@
 from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ValidationError
-from django.db.models import F
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
@@ -11,11 +9,12 @@ from django.contrib.auth import logout, login
 from .forms import *
 from .models import *
 from django.shortcuts import render
-from django.template import RequestContext
-from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .utils import *
 # Create your views here.
 
-class Index(ListView):
+
+class Index(ContextMixin, ListView):
     template_name = 'homepage.html'
     context_object_name = 'products'
     model = Product
@@ -28,7 +27,9 @@ class Index(ListView):
             context['cart_length'] = cart.cartproduct_set.count()
         except Exception:
             pass
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return context
+
 
 def test(request):
     product_val = Product.objects.values('title', 'actual_price')
@@ -54,7 +55,7 @@ class RegisterView(CreateView):
         return redirect('home')
 
 
-class AddProduct(CreateView):
+class AddProduct(ContextMixin, LoginRequiredMixin, CreateView):
     template_name = 'add-product.html'
     form_class = AddProductForm
     success_url = '/'
@@ -66,11 +67,11 @@ class AddProduct(CreateView):
             context['access'] = SiteUser.objects.get(user=self.request.user).contentMakerStatus
         except:
             context['access'] = False
-
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return context
 
 
-class MakeDiscountView(View):
+class MakeDiscountView(ContextMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             product = Product.objects.get(pk=kwargs['id'])
@@ -79,6 +80,7 @@ class MakeDiscountView(View):
         form = MakeDiscountForm(request.POST or None)
         context = {'product': product,
                    'form': form}
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'discount.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -103,11 +105,11 @@ class MakeDiscountView(View):
 
             product.save()
             return redirect('/')
-
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'discount.html', context)
 
 
-class DetailedView(View):
+class DetailedView(ContextMixin, View):
     def get(self, request, *args, **kwargs):
 
         try:
@@ -136,6 +138,7 @@ class DetailedView(View):
                     'is_anonymous': is_anonymous,
                     }
 
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'detailed_product.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -156,7 +159,7 @@ class DetailedView(View):
             return redirect('/')
 
 
-class MyCabinet(View):
+class MyCabinet(ContextMixin, View):
     def get(self, request, *agrs, **kwargs):
         try:
             site_user = SiteUser.objects.get(user=request.user)
@@ -182,14 +185,14 @@ class MyCabinet(View):
             'profile_image_url': profile_image_url,
             'request_list': request_list,
         }
-
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'cabinet.html', context=context)
 
     def post(self, request, *args, **kwargs):
         pass
 
 
-class MyCabinetChange(View):
+class MyCabinetChange(ContextMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             site_user = SiteUser.objects.get(user=request.user)
@@ -207,7 +210,7 @@ class MyCabinetChange(View):
         context = {
             'form': form,
         }
-
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'cabinet-change.html', context=context)
 
 
@@ -296,15 +299,19 @@ def LogoutUser(request):
     return redirect('/')
 
 
-class AllProduct(ListView):
+class AllProduct(ContextMixin, ListView):
     model = Product
     template_name = 'all-products.html'
     queryset = Product.objects.all()
     paginate_by = 4
     context_object_name = 'products'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(AllProduct, self).get_context_data(**kwargs)
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
+        return context
 
-class CategoriesView(ListView):
+class CategoriesView(ContextMixin, ListView):
     model = Category
     template_name = 'all-categories.html'
     context_object_name = 'categories'
@@ -312,19 +319,24 @@ class CategoriesView(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['products'] = Product.objects.all()
-        print(context)
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return context
 
 
-class CategoryView(ListView):
+class CategoryView(ContextMixin, ListView):
     template_name = 'category.html'
     context_object_name = 'products'
 
     def get_queryset(self):
         return Product.objects.filter(category=self.kwargs['pk'])
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(CategoryView, self).get_context_data(**kwargs)
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
+        return context
 
-class CartView(ListView):
+
+class CartView(ContextMixin, ListView):
     model = Cart
     template_name = 'cart.html'
     context_object_name = 'cart_products'
@@ -345,7 +357,7 @@ class CartView(ListView):
         cart_length = cart.cartproduct_set.count
         cart.save()
         context['cart'] = cart
-        context['cart_length'] = cart_length
+        context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return context
 
 
@@ -388,7 +400,7 @@ class ReduceQty(View):
         return redirect('cart')
 
 
-class PaymentView(View):
+class PaymentView(ContextMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             cart = Cart.objects.get_or_create(owner=SiteUser.objects.get(user=self.request.user))[0]
@@ -409,10 +421,9 @@ class PaymentView(View):
             context = {
                 'cart': cart,
                 'cart_products': cart_products,
-                'cart_length': cart_products.count(),
-                'bonus_balance': 1337,
                 'form': BonusInputForm()
             }
+            context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
 
             return render(request, 'payment.html', context)
 

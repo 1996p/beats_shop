@@ -54,5 +54,5 @@ class BonusInputForm(forms.Form):
     bonus_count = forms.IntegerField(widget=forms.TextInput(attrs={'min': 0,
                                                                    'value': 0,
                                                                    'type': 'number',
-                                                                   'style': 'max-width: 50px'
+                                                                   'style': 'max-width: 120px'
                                                                    }), label='Оплатить бонусами')

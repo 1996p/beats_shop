@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.db import transaction
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView, LogoutView
@@ -11,6 +12,9 @@ from .models import *
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .utils import *
+from decimal import Decimal
+
+
 # Create your views here.
 
 
@@ -129,14 +133,14 @@ class DetailedView(ContextMixin, View):
         form = AddCommentaryForm()
         is_anonymous = isinstance(request.user, AnonymousUser)
         context = {
-                    'id': kwargs['id'],
-                    'product': product,
-                    'author': author,
-                    'comments': comments,
-                    'have_comments': have_comments,
-                    'form': form,
-                    'is_anonymous': is_anonymous,
-                    }
+            'id': kwargs['id'],
+            'product': product,
+            'author': author,
+            'comments': comments,
+            'have_comments': have_comments,
+            'form': form,
+            'is_anonymous': is_anonymous,
+        }
 
         context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'detailed_product.html', context)
@@ -213,7 +217,6 @@ class MyCabinetChange(ContextMixin, View):
         context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return render(request, 'cabinet-change.html', context=context)
 
-
     def post(self, request, *args, **kwargs):
 
         try:
@@ -244,7 +247,6 @@ class MyCabinetChange(ContextMixin, View):
 
             return redirect('/my')
 
-
         return redirect('/')
 
 
@@ -255,7 +257,6 @@ class GetSellerStatusRequestView(View):
         return render(request, 'seller-request.html', {})
 
     def post(self, request, *args, **kwargs):
-
         return render(request, 'seller-request.html', {})
 
 
@@ -310,6 +311,7 @@ class AllProduct(ContextMixin, ListView):
         context = super(AllProduct, self).get_context_data(**kwargs)
         context = dict(list(context.items()) + list(self.get_user_context(self.request).items()))
         return context
+
 
 class CategoriesView(ContextMixin, ListView):
     model = Category
@@ -371,7 +373,7 @@ class AddToCartView(View):
         if not created:
             cart_product.qty += 1
         cart_product.save()
-        
+
         return redirect('cart')
 
 
@@ -427,12 +429,25 @@ class PaymentView(ContextMixin, View):
 
             return render(request, 'payment.html', context)
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
-        print(request.POST)
+        bonus_to_pay = request.POST['bonus_count']
+        user = SiteUser.objects.get(user=request.user)
+        cart = Cart.objects.get(owner=user)
+        money_to_pay = Decimal(cart.final_price) - Decimal(bonus_to_pay)
+        cart_products = cart.cartproduct_set.all()
 
+        if money_to_pay == 0:
+            print()
+            user.bonus_balance -= Decimal(bonus_to_pay)
+            for cart_product in cart_products:
+                new_order = Order.objects.create(owner=user, seller=cart_product.product.author,
+                                                 qty=cart_product.qty, product=cart_product.product)
+                new_order.save()
 
+            user.save()
 
+            return render(request, 'order-successful-created.html', {})
 
-
-
-
+        elif money_to_pay > 0:
+            pass  # Будет редирект на страницу, где происходит оплата оставшиеся суммы картой

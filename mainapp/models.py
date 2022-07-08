@@ -45,7 +45,6 @@ class SiteUser(models.Model):
     image = models.ImageField(blank=True, null=True, verbose_name='Аватар')
     bonus_balance = models.PositiveIntegerField(default=0, verbose_name='Бонусные баллы ')
 
-
     def __str__(self):
         return self.user.username
 
@@ -76,7 +75,6 @@ class CartProduct(models.Model):
 
 class Cart(models.Model):
     owner = models.ForeignKey(SiteUser, on_delete=models.CASCADE)
-    # products = models.ManyToManyField(CartProduct)
     final_price = models.DecimalField(decimal_places=2, max_digits=30, verbose_name="Итого к оплате", default=0)
     total_product = models.PositiveIntegerField(verbose_name='Всего товаров', default=0)
 
@@ -134,7 +132,15 @@ class Order(models.Model):
         opened = 'O', _('OPENED')
         closed = 'C', _('CLOSED')
 
-    owner = models.ForeignKey(SiteUser, on_delete=models.CASCADE, verbose_name='Покупатель')
+    owner = models.ForeignKey(SiteUser, on_delete=models.CASCADE, verbose_name='Покупатель', related_name='related_owner')
+    seller = models.ForeignKey(SiteUser, on_delete=models.CASCADE, null=True, verbose_name='Продавец', related_name='releated_seller')
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания заказа')
     status = models.CharField(max_length=1, choices=OrderStatus.choices, default=OrderStatus.opened, verbose_name='Статус заказа')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, verbose_name='Товар')
+    qty = models.PositiveIntegerField(verbose_name='Количество товара', null=True)
 
+    class Meta:
+        unique_together = ('owner', 'seller')
+
+    def __str__(self):
+        return f'{self.seller} -> {self.owner} | {self.product} ({self.qty})'

@@ -18,6 +18,7 @@ class ContextMixin:
         context = {
             'cart_length': cart_products.count(),
             'bonus_balance': SiteUser.objects.get(user=request.user).bonus_balance,
+            'request': request
         }
 
         return context

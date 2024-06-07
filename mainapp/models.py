@@ -59,8 +59,6 @@ class CartProduct(models.Model):
     final_price = models.DecimalField(decimal_places=2, max_digits=30, verbose_name="Общая цена", default=0)
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE, null=True)
     order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True)
-
-
     def save(self, *args, **kwargs):
         self.final_price = Decimal(self.qty) * Decimal(self.product.actual_price)
         return super().save(*args, **kwargs)
